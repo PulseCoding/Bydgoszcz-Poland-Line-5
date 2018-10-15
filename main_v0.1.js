@@ -908,7 +908,7 @@ try {
         ST: stateCheckweigher,
         CPQI: joinWord(resp.register[63], resp.register[62]),
         CPQO: joinWord(resp.register[65], resp.register[64]),
-        CPQR: joinWord(resp.register[67], resp.register[66],
+        CPQR: joinWord(resp.register[67], resp.register[66]),
           SP: speedCheckweigher
         };
         if (flagPrintCheckweigher == 1) {
