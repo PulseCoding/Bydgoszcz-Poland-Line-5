@@ -1,4 +1,4 @@
-try {
+
   var modbus = require('jsmodbus');
   var fs = require('fs');
   var httpClient = require('node-rest-client').Client;
@@ -1062,7 +1062,7 @@ try {
             i=0;
             text2send=[];
             for ( k=0;k<files.length;k++){//Verificar los archivos
-              var stats = fs.statSync("/home/oee/Pulse/BYD_L15_LOGS/"+files[k]);
+              var stats = fs.statSync("/home/oee/Pulse/BYD_L5_LOGS/"+files[k]);
               var mtime = new Date(stats.mtime).getTime();
               if (mtime< (Date.now() - (3*60*1000))&&files[k].indexOf("serialbox")==-1){
                 flagInfo2Send=1;
@@ -1217,7 +1217,3 @@ try {
     fs.appendFileSync("error.log", "ID 2: " + Date.now() + ": " + 'Client closed, stopping interval.' + "\n");
     stop();
   });
-
-} catch (err) {
-  fs.appendFileSync("error.log", "ID 3: " + Date.now() + ": " + err + "\n");
-}
