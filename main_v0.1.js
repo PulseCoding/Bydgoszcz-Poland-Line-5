@@ -1,7 +1,8 @@
 try {
   var modbus = require('jsmodbus');
   var fs = require('fs');
-  var PubNub = require('pubnub');
+  var httpClient = require('node-rest-client').Client;
+  var clientHttp = new httpClient();
   //Asignar host, puerto y otros par ametros al cliente Modbus
   var client = modbus.client.tcp.complete({
     'host': "192.168.20.16",
@@ -147,7 +148,7 @@ try {
   var Barcode, secBarcode = 0;
   var secEOL = 0;
   var publishConfig;
-  var secPubNub = 0;
+  var secPubNub = 60*5;
 
   var files = fs.readdirSync("/home/oee/Pulse/BYD_L5_LOGS/"); //Leer documentos
   var actualdate = Date.now(); //Fecha actual
@@ -155,11 +156,7 @@ try {
   var flagInfo2Send = 0;
   var i = 0;
 
-  pubnub = new PubNub({
-    publishKey: "pub-c-82cf38a9-061a-43e2-8a0f-21a6770ab473",
-    subscribeKey: "sub-c-e14aa146-bab0-11e8-b6ef-c2e67adadb66",
-    uuid: "bydgoszcz-L5-monitoring"
-  });
+
 
   var DoRead = function() {
     client.readHoldingRegisters(0, 99).then(function(resp) {
@@ -1060,13 +1057,45 @@ try {
           flagPrintPaletizer = 0;
         }
         //Paletizer -------------------------------------------------------------------------------------------------------------
-
+        if(secPubNub>=60*5){
+          function idle(){
+            i=0;
+            text2send=[];
+            for ( k=0;k<files.length;k++){//Verificar los archivos
+              var stats = fs.statSync("/home/oee/Pulse/BYD_L15_LOGS/"+files[k]);
+              var mtime = new Date(stats.mtime).getTime();
+              if (mtime< (Date.now() - (3*60*1000))&&files[k].indexOf("serialbox")==-1){
+                flagInfo2Send=1;
+                text2send[i]=files[k];
+                i++;
+              }
+            }
+          }
+          idle();
+          secPubNub=0;
+          publishConfig = {
+            headers: { "Content-Type": "application/json" },
+            data: {              message : {
+                                line: "15",
+                                tt: Date.now(),
+                                machines:text2send
+                              }}
+          };
+          senderData();
+        }
+        secPubNub++;
 
     })
   }
 
-  function senderData() {
-    pubnub.publish(publishConfig, function(status, response) {});
+  clientHttp.registerMethod("postMethod", "http://35.160.68.187:23000/heartbeatLine/Byd", "POST");
+
+
+  function senderData(){
+    clientHttp.methods.postMethod(publishConfig, function (data, response) {
+        // parsed response body as js object
+        console.log(data.toString());
+    });
   }
 
   var assignment = function(val) {
@@ -1157,6 +1186,7 @@ try {
   var stop = function() {
     ///This function clean data
     clearInterval(intId);
+    process.exit(0);
   };
 
   var shutdown = function() {
