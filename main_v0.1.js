@@ -1076,7 +1076,7 @@
           publishConfig = {
             headers: { "Content-Type": "application/json" },
             data: {              message : {
-                                line: "15",
+                                line: "5",
                                 tt: Date.now(),
                                 machines:text2send
                               }}
