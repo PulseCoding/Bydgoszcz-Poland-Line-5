@@ -12,7 +12,7 @@
     'logEnabled': true,
     'reconnectTimeout': 30000
   }).connect();
-  var intId, timeStop = 40,
+  var intId, timeStop = 20,
     flagONS1 = 0,
     flagONS2 = 0,
     flagONS3 = 0,
@@ -977,6 +977,7 @@
           ST: statePrinter,
           CPQI: joinWord(resp.register[69], resp.register[68]),
           CPQO: joinWord(resp.register[71], resp.register[70]),
+          CPQR: joinWord(resp.register[73], resp.register[72]),
           SP: speedPrinter
         };
         if (flagPrintPrinter == 1) {
@@ -1046,8 +1047,7 @@
         }
         Paletizer = {
           ST: statePaletizer,
-          CPQI: joinWord(resp.register[73], resp.register[72]),
-          CPQO: joinWord(resp.register[75], resp.register[74]),
+          CPQI: joinWord(resp.register[75], resp.register[74]),
           SP: speedPaletizer
         };
         if (flagPrintPaletizer == 1) {
